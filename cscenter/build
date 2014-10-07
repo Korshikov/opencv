@@ -1,0 +1,12 @@
+#!/bin/sh
+
+	for i in *.cpp; do
+		 if [ $1 = $i ]; then
+	    	echo "compiling $i"
+	    	g++ -ggdb `pkg-config --cflags opencv` -o `basename $i .cpp` $i `pkg-config --libs opencv`;
+		 fi	
+	done
+
+
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
