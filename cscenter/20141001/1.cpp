@@ -27,10 +27,5 @@ int main(int argc, char *argv[])
     
     absdiff(convert,lenaLeft,img);
 
-    imshow("lenaLeft", img);
-    imshow("lenaLeft2", convert);    
-
-    waitKey(0);
-
     return 0;
 }
