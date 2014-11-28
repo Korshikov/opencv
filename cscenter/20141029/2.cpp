@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdio>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -5,51 +6,81 @@
 using namespace cv;
 
 
-
-
-Mat finder(Mat const & input, bool const& width_ground = 1)
-{
-    cv::Size const img_size = input.size();
-    Mat result;
-    input.copyTo(result);
-    for(size_t i = img_size.height * img_size.width - 1; i!=0;--i)
-    {
-        used[i]=0;
-    }
-    used[0]=0;
-
-    for(size_t i =0; i< img_size.height * img_size.width; ++i)
-    {
-        if(!used[i])
-        {
-            inner_bfs(result,img_size,i,width_ground, used, rand()%256, rand()%256, rand()%256);
-        }
-    }
-}
-
-
-
-void inner_bfs(Mat & img,cv::Size const & img_size, size_t const & pos,bool const& width_ground, bool* used, uint8_t b, uint8_t r, uint8_t g)
-{
-    if(!used[pos])
-    {
-        if(img.at<uchar>(pos / img_size.width, pos % img_size.width)[0] == width_ground)
-        {
-
-        }
-        used[pos] = true;
-    }
-}
-
 int main(int argc, char *argv[])
 {
     Mat img = imread("image.jpg", CV_LOAD_IMAGE_COLOR);
     if(img.empty()) 
        return -1;
     
+    int res[img.rows][img.cols];
+    for(int i=0;i<img.rows;++i)
+    {
+        for(int t=0;t<img.cols;++i)
+        {
+            res[i][t] = 0;
+        }
+    }
 
-    
+
+    int counter = 0;
+    for(int i=0;i<img.rows;++i)
+    {
+        for(int t=0;t<img.cols;++i)
+        {
+            if(img.at<double>(i,t)==0)
+            {
+                continue;
+            }
+            res[i][t] = ++counter;
+            if(i > 0)
+            {
+                if((img.at<double>(i,t)==img.at<double>(i-1,t))&&(res[i-1][t]!=0))
+                {
+                    res[i][t] = res[i-1][t];
+                    continue;
+                }
+                
+            }
+            if(t > 0)
+            {
+                if((img.at<double>(i,t)==img.at<double>(i,t-1))&&(res[i][t-1]!=0))
+                {
+                    res[i][t] = res[i][t-1];
+                    continue;
+                }
+                
+            }
+            if((t > 0)&&(i > 0))
+            {
+                if((img.at<double>(i,t)==img.at<double>(i-1,t-1))&&(res[i-1][t-1]!=0))
+                {
+                    res[i][t] = res[i][t-1];
+                    continue;
+                }
+                
+            }
+        }
+    }
+
+
+    for(int i=0;i<img.rows;++i)
+    {
+        for(int t=0;t<img.cols;++i)
+        {
+            res[i][t] = std::min(res[i][t],
+                std::min((i>0?res[i-1][t]:counter),
+                    std::min((t>0?res[i][t-1]:counter),
+                        std::min((t>0&&i>0?res[i-1][t-1]:counter),
+                            std::min((i<img.rows-1?res[i+1][t]:counter),
+                                std::min((t<img.cols-1?res[i][t+1]:counter),
+                                    std::min((t<img.cols-1&&i<img.rows-1?res[i+1][t+1]:counter),
+                                        std::min(
+                                            (t>0&&i<img.rows-1?res[i+1][t-1]:counter),
+                                            (t<img.cols-1&&i>0?res[i-1][t+1]:counter)))))))));
+        }
+    }
+
+        
 
     return 0;
 }
-    bool used[img_size.height * img_size.width];

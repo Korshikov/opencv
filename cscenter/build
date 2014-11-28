@@ -3,7 +3,7 @@
 	for i in *.cpp; do
 		 if [ $1 = $i ]; then
 	    	echo "compiling $i"
-	    	g++ -ggdb `pkg-config --cflags opencv` -o `basename $i .cpp` $i `pkg-config --libs opencv`;
+	    	g++ -std=c++0x -ggdb `pkg-config --cflags opencv` -o `basename $i .cpp` $i `pkg-config --libs opencv`;
 		 fi	
 	done
 
